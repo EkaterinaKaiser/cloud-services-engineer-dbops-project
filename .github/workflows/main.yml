@@ -55,7 +55,7 @@ jobs:
       run: |
         wget -qO- cloud-services-engineer.gitlab.yandexcloud.net/practicum-cloud-services/dbops-autotests/-/package_files/1/download > dbopstest
         chmod +x ./dbopstest
-        mv ./dbopstest /usr/local/bin/dbopstest
+        sudo mv ./dbopstest /usr/local/bin/dbopstest
 
     ### Этот шаг оставьте без изменений
     - name: Test
