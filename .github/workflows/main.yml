@@ -31,7 +31,7 @@ jobs:
         echo "Archive extracted, listing contents..."
         ls -la flyway-11.1.0/
         echo "Creating symlink..."
-        sudo ln -s `pwd`/flyway-11.1.0/flyway /usr/local/bin/flyway
+        sudo ln -sf `pwd`/flyway-11.1.0/flyway /usr/local/bin/flyway
         echo "Symlink created, testing flyway..."
         flyway --version
 
