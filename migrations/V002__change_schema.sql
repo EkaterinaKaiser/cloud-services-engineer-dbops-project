@@ -1,3 +1,6 @@
+ALTER TABLE product ADD CONSTRAINT pk_product PRIMARY KEY (id);
+ALTER TABLE orders ADD CONSTRAINT pk_orders PRIMARY KEY (id);
+
 ALTER TABLE product ADD COLUMN price double precision;
 
 UPDATE product SET price = pi.price 
