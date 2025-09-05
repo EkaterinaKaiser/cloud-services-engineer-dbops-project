@@ -42,7 +42,7 @@ jobs:
     # Выполняем миграции с помощью Flyway, используя URL подключения и учётные данные для базы данных
     - name: Run Flyway migrations
       run: |
-        docker run --rm --network host \
+        sudo docker run --rm --network host \
           -v $PWD/migrations:/flyway/sql \
           flyway/flyway:11.1.0 \
           -url=jdbc:postgresql://localhost:5432/store \
