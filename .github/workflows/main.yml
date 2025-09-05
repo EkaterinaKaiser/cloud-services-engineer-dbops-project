@@ -6,11 +6,53 @@ on:
 jobs:
   migrate:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16 
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: store_default
+        ports:  
+          - 5432:5432
+        
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
     #### Добавьте шаг с Flyway-миграциями
+
+     # Устанавливаем JDK, который нужен для запуска приложений, написанных на Java (Flyway)
+    - name: Set up JDK
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+
+    # Загружаем и устанавливаем Flyway, чтобы можно было использовать его для управления миграциями
+    - name: Install Flyway
+      run: |
+        curl -L -o flyway-commandline.tar.gz "https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/11.1.0/flyway-commandline-11.1.0-linux-x64.tar.gz"
+        tar -xzf flyway-commandline.tar.gz
+        sudo ln -s `pwd`/flyway-11.1.0/flyway /usr/local/bin/flyway
+
+    # Проверяем, что Postgres работает и доступен перед выполнением миграций, чтобы избежать ошибок подключения
+    - name: Wait for Postgres
+      run: until pg_isready -h localhost -p 5432; do sleep 1; done
+
+    # Выполняем миграции с помощью Flyway, используя URL подключения и учётные данные для базы данных
+    - name: Run Flyway migrations
+      env:
+        FLYWAY_URL: "jdbc:postgresql://localhost:5432/store_default"
+        FLYWAY_USER: user
+        FLYWAY_PASSWORD: password
+      run: flyway migrate -locations=filesystem:sql/migrations 
 
     ### Этот шаг оставьте без изменений
     - name: Download and setup autotests binaries
