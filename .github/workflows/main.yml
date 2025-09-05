@@ -12,7 +12,7 @@ jobs:
         env:
           POSTGRES_USER: user
           POSTGRES_PASSWORD: password
-          POSTGRES_DB: store_default
+          POSTGRES_DB: store
         ports:  
           - 5432:5432
         
@@ -49,10 +49,10 @@ jobs:
     # Выполняем миграции с помощью Flyway, используя URL подключения и учётные данные для базы данных
     - name: Run Flyway migrations
       env:
-        FLYWAY_URL: "jdbc:postgresql://localhost:5432/store_default"
+        FLYWAY_URL: "jdbc:postgresql://localhost:5432/store"
         FLYWAY_USER: user
         FLYWAY_PASSWORD: password
-      run: flyway migrate -locations=filesystem:sql/migrations 
+      run: flyway migrate -locations=filesystem:migrations 
 
     ### Этот шаг оставьте без изменений
     - name: Download and setup autotests binaries
