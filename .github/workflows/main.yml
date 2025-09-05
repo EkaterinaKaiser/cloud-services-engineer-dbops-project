@@ -22,9 +22,18 @@ jobs:
     # Загружаем и устанавливаем Flyway, чтобы можно было использовать его для управления миграциями
     - name: Install Flyway
       run: |
+        echo "Starting Flyway download..."
         curl -L -o flyway-commandline.tar.gz "https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/11.1.0/flyway-commandline-11.1.0-linux-x64.tar.gz"
+        echo "Download completed, checking file..."
+        ls -la flyway-commandline.tar.gz
+        echo "Extracting archive..."
         tar -xzf flyway-commandline.tar.gz
+        echo "Archive extracted, listing contents..."
+        ls -la flyway-11.1.0/
+        echo "Creating symlink..."
         sudo ln -s `pwd`/flyway-11.1.0/flyway /usr/local/bin/flyway
+        echo "Symlink created, testing flyway..."
+        flyway --version
 
     # Проверяем, что Postgres работает и доступен перед выполнением миграций, чтобы избежать ошибок подключения
     - name: Wait for Postgres
@@ -32,11 +41,14 @@ jobs:
 
     # Выполняем миграции с помощью Flyway, используя URL подключения и учётные данные для базы данных
     - name: Run Flyway migrations
-      env:
-        FLYWAY_URL: "jdbc:postgresql://localhost:5432/store"
-        FLYWAY_USER: user
-        FLYWAY_PASSWORD: password
-      run: flyway migrate -locations=filesystem:migrations 
+      run: |
+        docker run --rm --network host \
+          -v $PWD/migrations:/flyway/sql \
+          flyway/flyway:11.1.0 \
+          -url=jdbc:postgresql://localhost:5432/store \
+          -user=user \
+          -password=password \
+          migrate
 
     ### Этот шаг оставьте без изменений
     - name: Download and setup autotests binaries
